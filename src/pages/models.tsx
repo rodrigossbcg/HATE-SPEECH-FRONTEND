@@ -1,4 +1,5 @@
 import { FC, useState } from "react";
+import axios from "axios";
 
 const Models: FC = () => {
   const percentage = 0;
@@ -6,6 +7,51 @@ const Models: FC = () => {
 
   const toggleDropdown = () => {
     setIsOpened(!isOpened);
+  };
+
+  const [inputText, setInputText] = useState("");
+  const [responseText, setResponseText] = useState("");
+  const [hatePercentage, setHatePercentage] = useState(0);
+
+  const handleInputChange = (e: any) => {
+    setInputText(e.target.value);
+  };
+
+  const handleSubmit = async (e: any) => {
+    e.preventDefault();
+    try {
+      const response = await axios.post("http://127.0.0.1:8000/api/example/", {
+        text: inputText,
+      });
+      if (response.data) {
+        setResponseText(response.data.response);
+        calculateHatePercentage(response.data.response);
+      }
+    } catch (error) {
+      console.error("There was an error making the request!", error);
+    }
+  };
+
+  const clear = () => {
+    setInputText("");
+    setResponseText("");
+    setHatePercentage(0);
+  };
+
+  // Helper function to check if a word is capitalized
+  const isCapitalized = (word: string) => {
+    if (word === "I") return false;
+    return word === word.toUpperCase() && word !== word.toLowerCase();
+  };
+
+  const calculateHatePercentage = (text: string) => {
+    const words = text.split(" ");
+    console.log(words);
+    const hateWords = words.filter((word) => isCapitalized(word));
+    console.log(hateWords);
+    const percentage = (hateWords.length / words.length) * 100;
+    const roundedPercentage = parseFloat(percentage.toFixed(1));
+    setHatePercentage(roundedPercentage);
   };
 
   return (
@@ -24,12 +70,37 @@ const Models: FC = () => {
         <div className="grid grid-cols-3 rounded-lg border-2 mx-[10%] flex-grow">
           <div className="col-span-2 relative h-full">
             <div className="p-4 rounded-l-lg shadow h-full relative">
-              <textarea
-                className="w-full h-full bg-transparent border-none outline-none resize-none text-base text-gray-500"
-                placeholder="Enter text..."
-              ></textarea>
-              <button className="absolute bottom-4 right-4 bg-blue-500 text-white px-4 py-2 rounded-md shadow-md">
-                Analyze text
+              {!responseText ? (
+                <textarea
+                  className="w-full h-full bg-transparent border-none outline-none resize-none text-base text-gray-500"
+                  placeholder="Enter text..."
+                  value={inputText}
+                  onChange={handleInputChange}
+                ></textarea>
+              ) : (
+                <div className="w-full h-full bg-transparent border-none outline-none resize-none text-base text-gray-500 mt-4">
+                  {responseText.split(" ").map((word, index) => (
+                    <span>
+                      <span
+                        key={index}
+                        className={
+                          isCapitalized(word)
+                            ? "bg-red-300 py-1 px-2 rounded-md"
+                            : ""
+                        }
+                      >
+                        {word}
+                      </span>{" "}
+                    </span>
+                  ))}
+                </div>
+              )}
+              <button
+                className="absolute bottom-4 right-4 bg-blue-500 text-white px-4 py-2 rounded-md shadow-md"
+                onClick={!responseText ? handleSubmit : () => clear()}
+                disabled={!inputText}
+              >
+                {!responseText ? "Analyze Text" : "Clear"}
               </button>
             </div>
           </div>
@@ -39,11 +110,11 @@ const Models: FC = () => {
               <div className="w-full h-2 bg-gray-300 rounded-full">
                 <div
                   className="h-full bg-blue-500 rounded-full"
-                  style={{ width: "75%" }}
+                  style={{ width: `${hatePercentage}%` }}
                 ></div>
               </div>
               <div className="text-gray-600 text-7xl mt-5 mb-2 font-bold text-center">
-                {percentage}%
+                {hatePercentage}%
               </div>
               <div className="text-sm text-center text-gray-500">
                 Likely to contain hatefull content
