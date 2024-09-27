@@ -1,8 +1,7 @@
-import { FC, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import axios from "axios";
 
 const Models: FC = () => {
-  const percentage = 0;
   const [isOpened, setIsOpened] = useState(false);
 
   const toggleDropdown = () => {
@@ -10,8 +9,15 @@ const Models: FC = () => {
   };
 
   const [inputText, setInputText] = useState("");
-  const [responseText, setResponseText] = useState("");
+  const [responseArray, setResponseArray] = useState<number[]>([]);
   const [hatePercentage, setHatePercentage] = useState(0);
+
+  useEffect(() => {
+    console.log(responseArray);
+    if (responseArray.length) {
+      calculateHatePercentage();
+    }
+  }, [responseArray]);
 
   const handleInputChange = (e: any) => {
     setInputText(e.target.value);
@@ -24,8 +30,8 @@ const Models: FC = () => {
         text: inputText,
       });
       if (response.data) {
-        setResponseText(response.data.response);
-        calculateHatePercentage(response.data.response);
+        setResponseArray(response.data.response);
+        calculateHatePercentage();
       }
     } catch (error) {
       console.error("There was an error making the request!", error);
@@ -34,22 +40,13 @@ const Models: FC = () => {
 
   const clear = () => {
     setInputText("");
-    setResponseText("");
+    setResponseArray([]);
     setHatePercentage(0);
   };
 
-  // Helper function to check if a word is capitalized
-  const isCapitalized = (word: string) => {
-    if (word === "I") return false;
-    return word === word.toUpperCase() && word !== word.toLowerCase();
-  };
-
-  const calculateHatePercentage = (text: string) => {
-    const words = text.split(" ");
-    console.log(words);
-    const hateWords = words.filter((word) => isCapitalized(word));
-    console.log(hateWords);
-    const percentage = (hateWords.length / words.length) * 100;
+  const calculateHatePercentage = () => {
+    const hateWords = responseArray.filter((position) => position === 1);
+    const percentage = (hateWords.length / responseArray.length) * 100;
     const roundedPercentage = parseFloat(percentage.toFixed(1));
     setHatePercentage(roundedPercentage);
   };
@@ -70,7 +67,7 @@ const Models: FC = () => {
         <div className="grid grid-cols-3 rounded-lg border-2 mx-[10%] flex-grow">
           <div className="col-span-2 relative h-full">
             <div className="p-4 rounded-l-lg shadow h-full relative">
-              {!responseText ? (
+              {!responseArray.length ? (
                 <textarea
                   className="w-full h-full bg-transparent border-none outline-none resize-none text-base text-gray-500"
                   placeholder="Enter text..."
@@ -79,28 +76,32 @@ const Models: FC = () => {
                 ></textarea>
               ) : (
                 <div className="w-full h-full bg-transparent border-none outline-none resize-none text-base text-gray-500 mt-4">
-                  {responseText.split(" ").map((word, index) => (
+                  {responseArray.map((hate, index) => (
                     <span>
-                      <span
+                      <a
                         key={index}
+                        href={`https://hatebase.org/search_results/keywords%3D${
+                          inputText.split(" ")[index]
+                        }`}
+                        target="_blank"
                         className={
-                          isCapitalized(word)
-                            ? "bg-red-300 py-1 px-2 rounded-md"
+                          hate
+                            ? "bg-red-300 py-1 px-2 rounded-md hover:cursor-pointer"
                             : ""
                         }
                       >
-                        {word}
-                      </span>{" "}
+                        {inputText.split(" ")[index]}
+                      </a>{" "}
                     </span>
                   ))}
                 </div>
               )}
               <button
                 className="absolute bottom-4 right-4 bg-blue-500 text-white px-4 py-2 rounded-md shadow-md"
-                onClick={!responseText ? handleSubmit : () => clear()}
+                onClick={!responseArray.length ? handleSubmit : () => clear()}
                 disabled={!inputText}
               >
-                {!responseText ? "Analyze Text" : "Clear"}
+                {!responseArray.length ? "Analyze Text" : "Clear"}
               </button>
             </div>
           </div>
