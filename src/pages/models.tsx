@@ -25,10 +25,15 @@ const Models: FC = () => {
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
+    console.log("Starting request...");
     try {
-      const response = await axios.post("http://127.0.0.1:8000/api/example/", {
-        text: inputText,
-      });
+      const response = await axios.post(
+        "http://13.61.121.212:8000/api/example/",
+        {
+          text: inputText,
+        }
+      );
+      console.log("Response received:", response.data);
       if (response.data) {
         setResponseArray(response.data.response);
         calculateHatePercentage();
