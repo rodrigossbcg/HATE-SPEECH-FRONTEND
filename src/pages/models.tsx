@@ -84,19 +84,19 @@ const Models: FC = () => {
                 <div className="w-full h-full bg-transparent border-none outline-none resize-none text-base text-gray-500 mt-4">
                   {responseArray.map((hate, index) => (
                     <span key={index}>
-                      <a
-                        href={`https://hatebase.org/search_results/keywords%3D${
-                          inputText.split(" ")[index]
-                        }`}
-                        target="_blank"
-                        className={
-                          hate
-                            ? "bg-red-300 py-1 px-2 rounded-md hover:cursor-pointer"
-                            : ""
-                        }
-                      >
-                        {inputText.split(" ")[index]}
-                      </a>{" "}
+                      {hate ? (
+                        <a
+                          href={`https://hatebase.org/search_results/keywords%3D${
+                            inputText.split(" ")[index]
+                          }`}
+                          target="_blank"
+                          className="bg-red-300 py-1 px-2 rounded-md hover:cursor-pointer"
+                        >
+                          {inputText.split(" ")[index]}
+                        </a>
+                      ) : (
+                        <span>{inputText.split(" ")[index]}</span>
+                      )}{" "}
                     </span>
                   ))}
                 </div>
