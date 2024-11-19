@@ -1,16 +1,14 @@
 import { FC, useEffect, useState } from "react";
+import { AiOutlineLoading } from "react-icons/ai";
 import axios from "axios";
 
 const Models: FC = () => {
   const [isOpened, setIsOpened] = useState(false);
 
-  const toggleDropdown = () => {
-    setIsOpened(!isOpened);
-  };
-
   const [inputText, setInputText] = useState("");
   const [responseArray, setResponseArray] = useState<number[]>([]);
   const [hatePercentage, setHatePercentage] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     console.log(responseArray);
@@ -24,11 +22,10 @@ const Models: FC = () => {
   };
 
   const handleSubmit = async (e: any) => {
-    e.preventDefault();
-    console.log("Starting request...");
+    setIsLoading(true);
     try {
       const response = await axios.post(
-        "http://13.61.121.212:8000/api/example/",
+        "https://85fb-13-61-121-212.ngrok-free.app/api/example/",
         {
           text: inputText,
         }
@@ -40,6 +37,8 @@ const Models: FC = () => {
       }
     } catch (error) {
       console.error("There was an error making the request!", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -113,9 +112,13 @@ const Models: FC = () => {
                     style={{ width: `${hatePercentage}%` }}
                   ></div>
                 </div>
-                <div className="text-gray-600 text-7xl mt-5 mb-2 font-bold text-center">
-                  {hatePercentage}%
-                </div>
+                {isLoading ? (
+                  <AiOutlineLoading className="animate-spin text-gray-600 text-7xl mt-5 mb-2 font-bold text-center mx-auto mb-5" />
+                ) : (
+                  <div className="text-gray-600 text-7xl mt-5 mb-5 font-bold text-center">
+                    {hatePercentage}%
+                  </div>
+                )}
                 <div className="text-sm text-center text-gray-500">
                   Likely to contain hatefull content
                 </div>
