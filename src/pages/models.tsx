@@ -3,8 +3,6 @@ import { AiOutlineLoading } from "react-icons/ai";
 import axios from "axios";
 
 const Models: FC = () => {
-  const [isOpened, setIsOpened] = useState(false);
-
   const [inputText, setInputText] = useState("");
   const [responseArray, setResponseArray] = useState<number[]>([]);
   const [hatePercentage, setHatePercentage] = useState(0);
@@ -70,7 +68,7 @@ const Models: FC = () => {
       </p>
       <div className="flex flex-col md:h-[50vh]">
         <div className="grid grid-cols-1 md:grid-cols-3 md:mx-[10%] flex-grow gap-2">
-          <div className="col-span-1 md:col-span-2 relative h-[36vh] md:h-full border border-gray-200 rounded-lg shadow">
+          <div className="col-span-1 md:col-span-2 relative h-[32vh] md:h-full border border-gray-200 rounded-lg shadow">
             <div className="p-4 relative h-full">
               {!responseArray.length ? (
                 <textarea
