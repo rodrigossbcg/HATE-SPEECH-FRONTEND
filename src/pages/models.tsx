@@ -68,7 +68,7 @@ const Models: FC = () => {
       </p>
       <div className="flex flex-col md:h-[50vh]">
         <div className="grid grid-cols-1 md:grid-cols-3 md:mx-[10%] flex-grow gap-2">
-          <div className="col-span-1 md:col-span-2 relative h-[28vh] md:h-full border border-gray-200 rounded-lg shadow">
+          <div className="col-span-1 md:col-span-2 relative h-[24vh] md:h-full border border-gray-200 rounded-lg shadow">
             <div className="p-4 relative h-full">
               {!responseArray.length ? (
                 <textarea
